@@ -1,0 +1,33 @@
+---
+backdrop_path: {{backdrop_path}}
+created_by: {{created_by}}
+episode_run_time: {{episode_run_time}}
+first_air_date: {{first_air_date}}
+genres: {{genres}}
+id: {{id}}
+in_production: {{in_production}}
+languages: {{languages}}
+last_air_date: {{last_air_date}}
+name: {{name}}
+networks: {{networks}}
+number_of_episodes: {{number_of_episodes}}
+number_of_seasons: {{number_of_seasons}}
+origin_country: {{origin_country}}
+original_language: {{original_language}}
+original_name: {{original_name}}
+overview: {{overview}}
+popularity: {{popularity}}
+poster_path: {{poster_path}}
+production_companies: {{production_companies}}
+production_countries: {{production_countries}}
+seasons: {{seasons}}
+spoken_languages: {{spoken_languages}}
+status: {{status}}
+tagline: {{tagline}}
+type: {{type}}
+vote_average: {{vote_average}}
+vote_count: {{vote_count}}
+streaming_providers_{{region}}: {{streaming_providers}}
+rent_providers_{{region}}: {{rent_providers}}
+buy_providers_{{region}}: {{buy_providers}}
+---

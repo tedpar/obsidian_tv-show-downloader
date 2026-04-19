@@ -1,0 +1,9 @@
+{
+  "id": "tv-show-downloader",
+  "name": "TV Show Downloader",
+  "version": "1.0.0",
+  "minAppVersion": "1.0.0",
+  "description": "Search TV shows via TMDB and save details as markdown files with frontmatter",
+  "author": "Ted Parnefors",
+  "isDesktopOnly": false
+}
