@@ -1,7 +1,5 @@
 import defaultTemplate from "../default-template.md";
-
-const IMG_ORIGINAL = "https://image.tmdb.org/t/p/original";
-const TMDB_SHOW_BASE = "https://www.themoviedb.org/tv";
+import { IMG_ORIGINAL, TMDB_SHOW_BASE } from "./tmdb";
 
 interface Provider {
   name: string;
@@ -130,7 +128,7 @@ function buildTemplateData(
     if (Array.isArray(value)) {
       const items = value
         .map((item) => serializeScalar(extractItemName(item as Nameable | string)))
-        .filter((s) => s !== "");
+        .filter(Boolean);
       data[key] = items.length > 0 ? items : null;
       continue;
     }
@@ -158,7 +156,7 @@ export function generateFrontmatter(
   template: string
 ): string {
   const tmpl = template.trim() || DEFAULT_TEMPLATE;
-  const preprocessed = tmpl.replace(/\{\{region\}\}/g, region.toLowerCase());
+  const preprocessed = tmpl.replace(/\{\{region\}\}/g, region);
   const data = buildTemplateData(show, providers);
   const lines = preprocessed.split("\n");
   const result: string[] = [];

@@ -1,4 +1,4 @@
-import { App, PluginSettingTab, Setting, AbstractInputSuggest } from "obsidian";
+import { App, PluginSettingTab, Setting, AbstractInputSuggest, Notice } from "obsidian";
 import TVShowSearchPlugin from "./main";
 import { fetchWatchProviderRegions } from "./tmdb";
 
@@ -153,6 +153,7 @@ export class TVShowSearchSettingTab extends PluginSettingTab {
   private regionOptions: RegionOption[] = FALLBACK_REGION_OPTIONS;
   private loadingRegions = false;
   private loadedForApiKey = "";
+  private apiKeySaveTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(app: App, plugin: TVShowSearchPlugin) {
     super(app, plugin);
@@ -176,7 +177,10 @@ export class TVShowSearchSettingTab extends PluginSettingTab {
           .setValue(this.plugin.settings.apiKey)
           .onChange(async (value) => {
             this.plugin.settings.apiKey = value;
-            await this.plugin.saveSettings();
+            if (this.apiKeySaveTimer) clearTimeout(this.apiKeySaveTimer);
+            this.apiKeySaveTimer = setTimeout(async () => {
+              await this.plugin.saveSettings();
+            }, 500);
           })
       );
 
@@ -217,7 +221,10 @@ export class TVShowSearchSettingTab extends PluginSettingTab {
           .setValue(this.getRegionLabel(this.plugin.settings.providerRegion))
           .onChange(async (value) => {
             const parsedCode = this.parseRegionInput(value);
-            if (!parsedCode) return;
+            if (!parsedCode) {
+              new Notice("Invalid region. Please select from the list.");
+              return;
+            }
             await saveRegionCode(parsedCode);
           });
       });

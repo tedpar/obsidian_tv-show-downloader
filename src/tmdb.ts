@@ -4,6 +4,7 @@ export const TMDB_BASE = "https://api.themoviedb.org/3";
 export const IMG_BASE = "https://image.tmdb.org/t/p/w342";
 export const IMG_ORIGINAL = "https://image.tmdb.org/t/p/original";
 export const LOGO_BASE = "https://image.tmdb.org/t/p/w45";
+export const TMDB_SHOW_BASE = "https://www.themoviedb.org/tv";
 
 export interface TVShowResult {
   id: number;
@@ -79,21 +80,26 @@ export async function searchTVShows(
   apiKey: string,
   query: string
 ): Promise<TVShowResult[]> {
-  if (!query.trim()) return [];
+  const page1 = await requestUrl({
+    url: `${TMDB_BASE}/search/tv?api_key=${apiKey}&query=${encodeURIComponent(query)}&page=1`,
+  });
 
-  const [page1, page2] = await Promise.all([
-    requestUrl({
-      url: `${TMDB_BASE}/search/tv?api_key=${apiKey}&query=${encodeURIComponent(query)}&page=1`,
-    }),
-    requestUrl({
-      url: `${TMDB_BASE}/search/tv?api_key=${apiKey}&query=${encodeURIComponent(query)}&page=2`,
-    }),
-  ]);
+  const results1 = page1.json.results || [];
+  const filtered1 = results1.filter((s: TVShowResult) => s.first_air_date);
 
-  const all = [
-    ...(page1.json.results || []),
-    ...(page2.json.results || []),
-  ];
+  if (filtered1.length >= 20) {
+    return filtered1
+      .sort((a: TVShowResult, b: TVShowResult) =>
+        b.first_air_date.localeCompare(a.first_air_date)
+      )
+      .slice(0, 25);
+  }
+
+  const page2 = await requestUrl({
+    url: `${TMDB_BASE}/search/tv?api_key=${apiKey}&query=${encodeURIComponent(query)}&page=2`,
+  });
+
+  const all = [...filtered1, ...(page2.json.results || [])];
   return all
     .filter((s: TVShowResult) => s.first_air_date)
     .sort((a: TVShowResult, b: TVShowResult) =>

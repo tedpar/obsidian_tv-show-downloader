@@ -16,8 +16,8 @@ const STAR_SVG = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentC
 
 export class TVShowSearchModal extends Modal {
   private plugin: TVShowSearchPlugin;
-  private searchView!: HTMLElement;
-  private detailView!: HTMLElement;
+  private searchView?: HTMLElement;
+  private detailView?: HTMLElement;
   private searchInput: HTMLInputElement | null = null;
   private resultsEl: HTMLElement | null = null;
   private results: TVShowResult[] = [];
