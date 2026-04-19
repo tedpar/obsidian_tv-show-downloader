@@ -30,4 +30,4 @@ No test framework, linter, or typecheck script is configured. TypeScript strict 
 - `homepage` is intentionally excluded from generated frontmatter
 - Array values in frontmatter use `- item` YAML syntax; empty/null values are omitted
 - Image paths in frontmatter include full `original` resolution URL
-- File names are derived from show name: non-alphanumeric → `_`, lowercased
+- File names are sanitized to remove invalid Windows path characters, with trailing dots and spaces removed.

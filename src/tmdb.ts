@@ -86,8 +86,9 @@ export async function searchTVShows(
 
   const results1 = page1.json.results || [];
   const filtered1 = results1.filter((s: TVShowResult) => s.first_air_date);
+  const totalPages = page1.json.total_pages || 1;
 
-  if (filtered1.length >= 20) {
+  if (totalPages <= 1 || filtered1.length >= 20) {
     return filtered1
       .sort((a: TVShowResult, b: TVShowResult) =>
         b.first_air_date.localeCompare(a.first_air_date)

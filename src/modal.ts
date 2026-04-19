@@ -491,15 +491,15 @@ export class TVShowSearchModal extends Modal {
   private async ensureFolder(folderPath: string) {
     if (!folderPath || folderPath === "/") return;
 
-    const adapter = this.app.vault.adapter;
-    if (await adapter.exists(folderPath)) return;
+    if (this.app.vault.getAbstractFileByPath(folderPath)) return;
 
     const parts = folderPath.split("/");
     let current = "";
     for (const part of parts) {
       current = current ? `${current}/${part}` : part;
-      if (!(await adapter.exists(current))) {
-        await adapter.mkdir(current);
+      const folder = this.app.vault.getAbstractFileByPath(current);
+      if (!folder) {
+        await this.app.vault.createFolder(current);
       }
     }
   }
