@@ -99,9 +99,10 @@ export async function searchTVShows(
     url: `${TMDB_BASE}/search/tv?api_key=${apiKey}&query=${encodeURIComponent(query)}&page=2`,
   });
 
-  const all = [...filtered1, ...(page2.json.results || [])];
+  const results2 = (page2.json.results || []) as TVShowResult[];
+  const filtered2 = results2.filter((s: TVShowResult) => s.first_air_date);
+  const all = [...filtered1, ...filtered2];
   return all
-    .filter((s: TVShowResult) => s.first_air_date)
     .sort((a: TVShowResult, b: TVShowResult) =>
       b.first_air_date.localeCompare(a.first_air_date)
     )
