@@ -1,4 +1,4 @@
-import { App, PluginSettingTab, Setting, AbstractInputSuggest, Notice } from "obsidian";
+import { App, PluginSettingTab, Setting, AbstractInputSuggest } from "obsidian";
 import TVShowSearchPlugin from "./main";
 import { fetchWatchProviderRegions } from "./tmdb";
 
@@ -161,7 +161,7 @@ export class TVShowSearchSettingTab extends PluginSettingTab {
   }
 
   display(): void {
-    this.ensureRegionOptionsLoaded();
+    void this.ensureRegionOptionsLoaded();
 
     const { containerEl } = this;
     containerEl.empty();
@@ -191,7 +191,7 @@ export class TVShowSearchSettingTab extends PluginSettingTab {
       )
       .addSearch((cb) => {
         const saveFolder = async (value: string): Promise<void> => {
-          this.plugin.settings.saveFolder = value;
+          this.plugin.settings.saveFolder = this.normalizeFolderPath(value);
           await this.plugin.saveSettings();
         };
 
@@ -207,6 +207,15 @@ export class TVShowSearchSettingTab extends PluginSettingTab {
         "Select the country/region used for streaming provider lookup"
       )
       .addSearch((cb) => {
+        const commitRegionInput = async (): Promise<void> => {
+          const parsedCode = this.parseRegionInput(cb.getValue());
+          if (!parsedCode) {
+            cb.setValue(this.getRegionLabel(this.plugin.settings.providerRegion));
+            return;
+          }
+          await saveRegionCode(parsedCode);
+        };
+
         const saveRegionCode = async (code: string): Promise<void> => {
           const normalized = this.normalizeRegionCode(code);
           this.plugin.settings.providerRegion = normalized;
@@ -218,15 +227,18 @@ export class TVShowSearchSettingTab extends PluginSettingTab {
 
         cb
           .setPlaceholder("Sweden (SE)")
-          .setValue(this.getRegionLabel(this.plugin.settings.providerRegion))
-          .onChange(async (value) => {
-            const parsedCode = this.parseRegionInput(value);
-            if (!parsedCode) {
-              new Notice("Invalid region. Please select from the list.");
-              return;
-            }
-            await saveRegionCode(parsedCode);
-          });
+          .setValue(this.getRegionLabel(this.plugin.settings.providerRegion));
+
+        cb.inputEl.addEventListener("blur", () => {
+          void commitRegionInput();
+        });
+
+        cb.inputEl.addEventListener("keydown", (evt) => {
+          if (evt.key !== "Enter") return;
+          evt.preventDefault();
+          void commitRegionInput();
+          cb.inputEl.blur();
+        });
       });
 
     new Setting(containerEl)
@@ -283,6 +295,7 @@ export class TVShowSearchSettingTab extends PluginSettingTab {
           a.name.localeCompare(b.name)
         );
         this.loadedForApiKey = apiKey;
+        this.display();
       }
     } catch {
       this.loadedForApiKey = "";
@@ -295,6 +308,12 @@ export class TVShowSearchSettingTab extends PluginSettingTab {
     const normalized = value.trim().toUpperCase();
     if (/^[A-Z]{2}$/.test(normalized)) return normalized;
     return "SE";
+  }
+
+  private normalizeFolderPath(value: string): string {
+    const trimmed = value.trim();
+    if (!trimmed) return "";
+    return trimmed.replace(/^\/+|\/+$/g, "");
   }
 
   private parseRegionInput(value: string): string | null {

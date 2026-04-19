@@ -62,6 +62,9 @@ export class TVShowSearchModal extends Modal {
     this.searchRequestId += 1;
     this.detailRequestId += 1;
     this.inDetailView = false;
+    this.currentShow = null;
+    this.selectedDetails = null;
+    this.providers = null;
     this.modalEl.removeEventListener("keydown", this.onModalKeydown, true);
   }
 
@@ -363,7 +366,7 @@ export class TVShowSearchModal extends Modal {
     const provSection = this.detailView.createDiv({
       cls: "tv-providers-section",
     });
-    const region = providerRegion;
+    const region = this.getRegionDisplayLabel(providerRegion);
     provSection.createEl("h3", { text: `Streaming in ${region}` });
 
     const hasAny =
@@ -396,6 +399,9 @@ export class TVShowSearchModal extends Modal {
   private showSearchView() {
     this.detailRequestId += 1;
     this.inDetailView = false;
+    this.currentShow = null;
+    this.selectedDetails = null;
+    this.providers = null;
     this.detailView.hide();
     this.searchView.show();
     setTimeout(() => this.searchInput?.focus(), 50);
@@ -434,7 +440,7 @@ export class TVShowSearchModal extends Modal {
       providerRegion,
       template
     );
-    const folder = this.plugin.settings.saveFolder;
+    const folder = this.normalizeFolderPath(this.plugin.settings.saveFolder);
     const fileName = `${this.sanitizeFileName(show.name)}.md`;
     const filePath = folder ? `${folder}/${fileName}` : fileName;
 
@@ -506,7 +512,30 @@ export class TVShowSearchModal extends Modal {
 
   private normalizeRegion(value: string): string {
     const normalized = value.trim().toUpperCase();
-    return normalized || "SE";
+    if (/^[A-Z]{2}$/.test(normalized)) return normalized;
+    return "SE";
+  }
+
+  private normalizeFolderPath(value: string): string {
+    const trimmed = value.trim();
+    if (!trimmed) return "";
+    return trimmed.replace(/^\/+|\/+$/g, "");
+  }
+
+  private getRegionDisplayLabel(regionCode: string): string {
+    try {
+      const locale =
+        (typeof navigator !== "undefined" && navigator.language) ||
+        Intl.DateTimeFormat().resolvedOptions().locale ||
+        "en";
+      const display = new Intl.DisplayNames([locale], { type: "region" });
+      const regionName = display.of(regionCode);
+      if (regionName) return `${regionName} (${regionCode})`;
+    } catch {
+      // Ignore and fall back to raw region code.
+    }
+
+    return regionCode;
   }
 
   private sanitizeFileName(name: string): string {

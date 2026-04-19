@@ -80,8 +80,20 @@ export async function searchTVShows(
   apiKey: string,
   query: string
 ): Promise<TVShowResult[]> {
+  const key = apiKey.trim();
+  if (!key) return [];
+
+  const sortByFirstAirDateDesc = (a: TVShowResult, b: TVShowResult) => {
+    const parseDate = (value: string): number => {
+      const ts = Date.parse(value);
+      return Number.isNaN(ts) ? 0 : ts;
+    };
+
+    return parseDate(b.first_air_date) - parseDate(a.first_air_date);
+  };
+
   const page1 = await requestUrl({
-    url: `${TMDB_BASE}/search/tv?api_key=${apiKey}&query=${encodeURIComponent(query)}&page=1`,
+    url: `${TMDB_BASE}/search/tv?api_key=${encodeURIComponent(key)}&query=${encodeURIComponent(query)}&page=1`,
   });
 
   const results1 = page1.json.results || [];
@@ -90,23 +102,19 @@ export async function searchTVShows(
 
   if (totalPages <= 1 || filtered1.length >= 20) {
     return filtered1
-      .sort((a: TVShowResult, b: TVShowResult) =>
-        b.first_air_date.localeCompare(a.first_air_date)
-      )
+      .sort(sortByFirstAirDateDesc)
       .slice(0, 25);
   }
 
   const page2 = await requestUrl({
-    url: `${TMDB_BASE}/search/tv?api_key=${apiKey}&query=${encodeURIComponent(query)}&page=2`,
+    url: `${TMDB_BASE}/search/tv?api_key=${encodeURIComponent(key)}&query=${encodeURIComponent(query)}&page=2`,
   });
 
   const results2 = (page2.json.results || []) as TVShowResult[];
   const filtered2 = results2.filter((s: TVShowResult) => s.first_air_date);
   const all = [...filtered1, ...filtered2];
   return all
-    .sort((a: TVShowResult, b: TVShowResult) =>
-      b.first_air_date.localeCompare(a.first_air_date)
-    )
+    .sort(sortByFirstAirDateDesc)
     .slice(0, 25);
 }
 
@@ -115,8 +123,11 @@ export async function fetchProviders(
   tvId: number,
   region: string
 ): Promise<Providers> {
+  const key = apiKey.trim();
+  if (!key) return { stream: [], rent: [], buy: [] };
+
   const response = await requestUrl({
-    url: `${TMDB_BASE}/tv/${tvId}/watch/providers?api_key=${apiKey}`,
+    url: `${TMDB_BASE}/tv/${tvId}/watch/providers?api_key=${encodeURIComponent(key)}`,
   });
   const data = response.json as { results?: Record<string, TMDBWatchRegionData> };
   const regionData = data.results?.[region];
@@ -142,8 +153,9 @@ export async function fetchTVDetails(
   apiKey: string,
   tvId: number
 ): Promise<TVShowDetails> {
+  const key = apiKey.trim();
   const response = await requestUrl({
-    url: `${TMDB_BASE}/tv/${tvId}?api_key=${apiKey}`,
+    url: `${TMDB_BASE}/tv/${tvId}?api_key=${encodeURIComponent(key)}`,
   });
   return response.json as TVShowDetails;
 }

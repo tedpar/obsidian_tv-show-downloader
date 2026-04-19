@@ -7,7 +7,7 @@ An Obsidian plugin that allows you to effortlessly search for TV shows using The
 - **Search TV Shows**: Quickly search the TMDB database directly from within Obsidian.
 - **Rich Metadata**: Automatically extracts metadata into YAML frontmatter. Empty or null values are automatically omitted from the final note.
 - **Streaming Providers**: Retrieves streaming provider availability. Defaults to the `SE` (Sweden) region, but is configurable.
-- **Customizable Organization**: Define a specific folder where all your TV show notes will be saved. File names are automatically formatted for Obsidian compatibility (non-alphanumeric characters replaced with underscores, and lowercased).
+- **Customizable Organization**: Define a specific folder where all your TV show notes will be saved. File names are sanitized for cross-platform compatibility (invalid Windows path characters are replaced, trailing dots/spaces removed, and reserved DOS names avoided).
 - **Auto-Open**: Optionally open the newly created note immediately after saving.
 - **Custom Templates**: Define your own Markdown template to control exactly how the metadata is structured and formatted in the resulting note.
 
@@ -37,7 +37,7 @@ Properties are mapped using double curly braces (e.g., `{{name}}`). When the not
 1. **Arrays**: If a property is an array (like `genres` or `networks`), the plugin extracts their names and formats them as a proper YAML list.
 2. **Empty Values**: If a property has no value, is `null`, or an array is empty, **the entire line containing that property placeholder will be skipped and omitted from the final note**.
 3. **Images**: `poster_path` and `backdrop_path` are automatically converted into full `original` resolution image URLs.
-4. **Regions**: You can use `{{region}}` to dynamically insert your configured region code (in lowercase) into a property key.
+4. **Regions**: You can use `{{region}}` to dynamically insert your configured region code (uppercase, e.g. `SE`, `US`) into a property key.
 
 ### Available Properties
 
@@ -80,7 +80,7 @@ You can use any of the following properties in your template.
 - `{{streaming_providers}}` - List of active streaming providers (e.g., Netflix, Hulu) for your region.
 - `{{rent_providers}}` - List of services where you can rent the show in your region.
 - `{{buy_providers}}` - List of services where you can buy the show in your region.
-- `{{region}}` - The lowercase region code (e.g., `se`, `us`) of your configured region. Often used dynamically in keys like: `streaming_{{region}}: {{streaming_providers}}`.
+- `{{region}}` - The region code (e.g., `SE`, `US`) from your configured provider region. Often used dynamically in keys like: `streaming_{{region}}: {{streaming_providers}}`.
 
 *Note: The `homepage` property from TMDB is intentionally excluded.*
 

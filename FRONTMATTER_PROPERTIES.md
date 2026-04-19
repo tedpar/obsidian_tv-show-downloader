@@ -1,8 +1,8 @@
 # TV Show Markdown Frontmatter Properties
 
-This document lists all properties included in the generated markdown frontmatter when exporting a TV show.
+This document lists properties available to the template/frontmatter generator when exporting a TV show.
 
-Properties come from the [TMDB TV Detail API](https://developer.themoviedb.org/reference/tv-series-details) and the [Watch Providers API](https://developer.themoviedb.org/reference/watch-providers) (Sweden region).
+Properties come from the [TMDB TV Detail API](https://developer.themoviedb.org/reference/tv-series-details) and the [Watch Providers API](https://developer.themoviedb.org/reference/watch-providers) (configured provider region).
 
 ## Core Identifiers
 
@@ -51,17 +51,14 @@ Properties come from the [TMDB TV Detail API](https://developer.themoviedb.org/r
 | `production_countries` | array | List of production country codes/names |
 | `origin_country` | array | List of country codes where the show originated |
 | `networks` | array | List of broadcasting network names |
-| `companies` | array | List of associated company names |
 
 ## Classification
 
 | Property | Type | Description |
 |---|---|---|
 | `genres` | array | List of genre names (e.g. Drama, Comedy) |
-| `genre_ids` | array | List of TMDB genre IDs |
 | `type` | string | Show type classification (e.g. Documentary, Scripted) |
 | `status` | string | Current status (e.g. Returning Series, Ended, Canceled) |
-| `adult` | boolean | Whether the show is rated adult content |
 | `in_production` | boolean | Whether the show is currently in production |
 
 ## Episodes & Seasons
@@ -72,7 +69,6 @@ Properties come from the [TMDB TV Detail API](https://developer.themoviedb.org/r
 | `number_of_episodes` | number | Total number of episodes across all seasons |
 | `seasons` | array | List of season names/identifiers |
 | `episode_run_time` | array | Typical episode runtime in minutes |
-| `next_episode_to_air` | string | Info about the next upcoming episode |
 
 ## Languages & Locales
 
@@ -86,17 +82,16 @@ Properties come from the [TMDB TV Detail API](https://developer.themoviedb.org/r
 | Property | Type | Description |
 |---|---|---|
 | `homepage` | string | Official website URL *(excluded from frontmatter)* |
-| `imdb_id` | string | IMDb identifier (e.g. tt0944947) |
 
-## Streaming Providers (Sweden)
+## Streaming Providers (Configured Region)
 
-These properties are sourced from the TMDB Watch Providers API, filtered to Sweden (SE).
+These properties are sourced from the TMDB Watch Providers API, filtered to your configured provider region.
 
 | Property | Type | Description |
 |---|---|---|
-| `streaming_providers_se` | array | Services where the show is available to stream (subscription) |
-| `rent_providers_se` | array | Services where the show can be rented |
-| `buy_providers_se` | array | Services where the show can be purchased |
+| `streaming_providers_{{region}}` | array | Services where the show is available to stream (subscription) |
+| `rent_providers_{{region}}` | array | Services where the show can be rented |
+| `buy_providers_{{region}}` | array | Services where the show can be purchased |
 
 ## Notes
 
