@@ -108,7 +108,7 @@ export class TVShowSearchModal extends Modal {
     this.searchInput.addEventListener("input", () => {
       if (this.debounceTimer) clearTimeout(this.debounceTimer);
       const q = this.searchInput!.value;
-      this.debounceTimer = setTimeout(() => this.doSearch(q), 350);
+      this.debounceTimer = setTimeout(() => this.doSearch(q), 600);
     });
 
     this.searchInput.addEventListener("keydown", (e) =>
